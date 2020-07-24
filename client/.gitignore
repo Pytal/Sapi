@@ -1,0 +1,18 @@
+# next
+/.next
+/out
+
+# linaria
+/.linaria
+
+# vercel
+/.vercel
+
+# pwa
+/public/sw.js*
+/public/workbox-*.js*
+
+# graphql
+/graphql
+/src/operations/types
+/src/operations/*Operations.ts

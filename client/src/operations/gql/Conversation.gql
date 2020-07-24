@@ -1,0 +1,135 @@
+mutation AddConversation($profileID: Int!) {
+  insert_conversation_one(
+    object: {
+      owner_id: $profileID
+    }
+  ) {
+    id
+  }
+}
+
+
+mutation AddConversationParticipant($conversationID: Int!, $participantID: Int!) {
+  insert_conversation_participant_one(
+    object: {
+      conversation_id: $conversationID
+      participant_id: $participantID
+    }
+  ) {
+    conversationID: conversation_id
+  }
+}
+
+
+query CheckConversation($ownerID: Int!, $participantID: Int!) {
+  conversation(
+    where:
+      {_or:
+        [
+          {_and:
+            [
+              {owner_id: {_eq: $ownerID}},
+              {conversation_participants: {participant_id: {_eq: $participantID}}}
+            ]
+          },
+          {_and:
+            [
+              {owner_id: {_eq: $participantID}},
+              {conversation_participants: {participant_id: {_eq: $ownerID}}}
+            ]
+          }
+        ]
+      }
+  ) {
+    id
+  }
+}
+
+
+fragment profileSet on profile {
+  id
+  firstName: first_name
+  profilePicture: profile_picture
+}
+
+
+query GetChatProfiles($conversationID: Int!) {
+  conversation_by_pk(id: $conversationID) {
+    profile {
+      ...profileSet
+    }
+    conversationParticipants: conversation_participants(limit: 1) {
+      profile {
+        ...profileSet
+      }
+    }
+  }
+}
+
+
+mutation AddMessage($conversationID: Int!, $senderID: Int!, $content: String!) {
+  insert_message_one(
+    object: {
+      conversation_id: $conversationID
+      sender_id: $senderID
+      content: $content
+    }
+  ) {
+    content
+  }
+}
+
+
+mutation AddSpoon($senderID: Int!, $recipientID: Int!) {
+  insert_spoon_one(
+    object: {
+      sender_id: $senderID
+      recipient_id: $recipientID
+    }
+  ) {
+    senderID: sender_id
+  }
+}
+
+
+subscription OnAddConversation($profileID: Int!) {
+  conversation(where: {
+    _or: [
+      {owner_id: {_eq: $profileID}},
+      {conversation_participants: {participant_id: {_eq: $profileID}}}
+    ]
+  }) {
+    id
+    profile {
+      ...profileSet
+    }
+    conversationParticipants: conversation_participants {
+      profile {
+        ...profileSet
+      }
+    }
+    messages(limit: 1, order_by: {timestamp: desc}) {
+      content
+    }
+  }
+}
+
+
+subscription OnAddSpoon {
+  spoon(order_by: {timestamp: asc}) {
+    profile {
+      ...profileSet
+    }
+  }
+}
+
+
+subscription OnAddMessage($conversationID: Int!) {
+  message(
+    where: {conversation_id: {_eq: $conversationID}},
+    order_by: {timestamp: desc}
+  ) {
+    senderID: sender_id
+    content
+  }
+}

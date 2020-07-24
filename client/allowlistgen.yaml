@@ -1,0 +1,7 @@
+schema: graphql/schema.graphql
+documents: src/**/*.gql
+generates:
+
+  graphql/allowlist.gql:
+    plugins:
+      - graphql-codegen-join-documents

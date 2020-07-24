@@ -1,0 +1,10 @@
+schema:
+  ${NEXT_PUBLIC_GRAPHQL_ENDPOINT}:
+    headers:
+      ${GRAPHQL_ENDPOINT_HEADER_NAME}: ${GRAPHQL_ENDPOINT_HEADER_VALUE}
+
+generates:
+  graphql/schema.graphql:
+    plugins:
+      - schema-ast:
+          commentDescriptions: true

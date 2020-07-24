@@ -1,0 +1,161 @@
+- name: allowed-queries
+  definition:
+    queries:
+    - name: AddConversation
+      query: |-
+        mutation AddConversation($profileID: Int!) {
+          insert_conversation_one(object: {owner_id: $profileID}) {
+            id
+          }
+        }
+    - name: AddConversationParticipant
+      query: |-
+        mutation AddConversationParticipant($conversationID: Int!, $participantID: Int!) {
+          insert_conversation_participant_one(object: {conversation_id: $conversationID, participant_id: $participantID}) {
+            conversationID: conversation_id
+          }
+        }
+    - name: CheckConversation
+      query: |-
+        query CheckConversation($ownerID: Int!, $participantID: Int!) {
+          conversation(where: {_or: [{_and: [{owner_id: {_eq: $ownerID}}, {conversation_participants: {participant_id: {_eq: $participantID}}}]}, {_and: [{owner_id: {_eq: $participantID}}, {conversation_participants: {participant_id: {_eq: $ownerID}}}]}]}) {
+            id
+          }
+        }
+    - name: AddMessage
+      query: |-
+        mutation AddMessage($conversationID: Int!, $senderID: Int!, $content: String!) {
+          insert_message_one(object: {conversation_id: $conversationID, sender_id: $senderID, content: $content}) {
+            content
+          }
+        }
+    - name: AddSpoon
+      query: |-
+        mutation AddSpoon($senderID: Int!, $recipientID: Int!) {
+          insert_spoon_one(object: {sender_id: $senderID, recipient_id: $recipientID}) {
+            senderID: sender_id
+          }
+        }
+    - name: OnAddSpoon
+      query: |-
+        subscription OnAddSpoon {
+          spoon(order_by: {timestamp: asc}) {
+            profile {
+              ...profileSet
+            }
+          }
+        }
+
+        fragment profileSet on profile {
+          id
+          firstName: first_name
+          profilePicture: profile_picture
+        }
+    - name: OnAddMessage
+      query: |-
+        subscription OnAddMessage($conversationID: Int!) {
+          message(where: {conversation_id: {_eq: $conversationID}}, order_by: {timestamp: desc}) {
+            senderID: sender_id
+            content
+          }
+        }
+    - name: SearchRestaurants
+      query: |-
+        query SearchRestaurants($search: String!) {
+          search(term: $search, location: "Vancouver, BC", limit: 8) {
+            business {
+              name
+              photos
+              url
+              reviews {
+                user {
+                  name
+                  imageURL: image_url
+                }
+                text
+              }
+            }
+          }
+        }
+    - name: GetProfile
+      query: |-
+        query GetProfile($userID: String!) {
+          profile_by_pk(user_id: $userID) {
+            firstName: first_name
+            lastName: last_name
+            birthDate: birth_date
+            gender
+            bio
+            id
+            profilePicture: profile_picture
+          }
+        }
+    - name: AddProfile
+      query: |-
+        mutation AddProfile($userID: String!, $profile: profile_set_input) {
+          update_profile_by_pk(pk_columns: {user_id: $userID}, _set: $profile) {
+            id
+          }
+        }
+    - name: GetNearbyProfiles
+      query: |-
+        query GetNearbyProfiles($profileID: Int!) {
+          profile(where: {id: {_neq: $profileID}}) {
+            id
+            firstName: first_name
+            profilePicture: profile_picture
+          }
+        }
+    - name: GetNearbyProfile
+      query: |-
+        query GetNearbyProfile($id: Int!) {
+          profile(where: {id: {_eq: $id}}) {
+            profilePicture: profile_picture
+            firstName: first_name
+            bio
+          }
+        }
+    - name: OnAddConversation
+      query: |-
+        subscription OnAddConversation($profileID: Int!) {
+          conversation(where: {_or: [{owner_id: {_eq: $profileID}}, {conversation_participants: {participant_id: {_eq: $profileID}}}]}) {
+            id
+            profile {
+              ...profileSet
+            }
+            conversationParticipants: conversation_participants {
+              profile {
+                ...profileSet
+              }
+            }
+            messages(limit: 1, order_by: {timestamp: desc}) {
+              content
+            }
+          }
+        }
+
+        fragment profileSet on profile {
+          id
+          firstName: first_name
+          profilePicture: profile_picture
+        }
+    - name: GetChatProfiles
+      query: |-
+        query GetChatProfiles($conversationID: Int!) {
+          conversation_by_pk(id: $conversationID) {
+            profile {
+              ...profileSet
+            }
+            conversationParticipants: conversation_participants(limit: 1) {
+              profile {
+                ...profileSet
+              }
+            }
+          }
+        }
+
+        fragment profileSet on profile {
+          id
+          firstName: first_name
+          profilePicture: profile_picture
+        }

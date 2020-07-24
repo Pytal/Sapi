@@ -1,0 +1,42 @@
+schema: graphql/schema.graphql
+documents: src/**/*.gql
+generates:
+
+  src/operations/types/types.ts:
+    plugins:
+      - typescript:
+          onlyOperationTypes: true
+          declarationKind: interface
+          enumsAsTypes: true
+          avoidOptionals: false
+
+  src/:
+    preset: near-operation-file
+    presetConfig:
+      baseTypesPath: operations/types/types.ts
+      extension: Operations.ts
+      folder: ../
+    plugins:
+      - typescript-operations:
+          preResolveTypes: true
+          flattenGeneratedTypes: true
+      - typescript-urql:
+          withComponent: false
+          withHooks: true
+          documentMode: external
+      - typescript-graphql-request:
+          documentMode: string
+          rawRequest: false
+    config:
+      omitOperationSuffix: false
+      operationResultSuffix: Data
+      documentVariableSuffix: ''
+      avoidOptionals: true
+
+config:
+  skipTypename: true
+  namingConvention: keep
+
+hooks:
+  afterAllFileWrite:
+    node scripts/postgen.js

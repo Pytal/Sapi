@@ -1,0 +1,264 @@
+- table:
+    schema: public
+    name: conversation
+  object_relationships:
+  - name: profile
+    using:
+      foreign_key_constraint_on: owner_id
+  array_relationships:
+  - name: conversation_participants
+    using:
+      foreign_key_constraint_on:
+        column: conversation_id
+        table:
+          schema: public
+          name: conversation_participant
+  - name: messages
+    using:
+      foreign_key_constraint_on:
+        column: conversation_id
+        table:
+          schema: public
+          name: message
+  insert_permissions:
+  - role: user
+    permission:
+      check:
+        profile:
+          user_id:
+            _eq: X-Hasura-User-Id
+      columns:
+      - owner_id
+      backend_only: false
+  select_permissions:
+  - role: user
+    permission:
+      columns:
+      - created_at
+      - id
+      - owner_id
+      filter:
+        _or:
+        - profile:
+            user_id:
+              _eq: X-Hasura-User-Id
+        - conversation_participants:
+            profile:
+              user_id:
+                _eq: X-Hasura-User-Id
+      limit: 20
+  update_permissions:
+  - role: user
+    permission:
+      columns: []
+      filter:
+        profile:
+          user_id:
+            _eq: X-Hasura-User-Id
+      check: null
+- table:
+    schema: public
+    name: conversation_participant
+  object_relationships:
+  - name: conversation
+    using:
+      foreign_key_constraint_on: conversation_id
+  - name: profile
+    using:
+      foreign_key_constraint_on: participant_id
+  insert_permissions:
+  - role: user
+    permission:
+      check:
+        _or:
+        - conversation:
+            profile:
+              user_id:
+                _eq: X-Hasura-User-Id
+        - profile:
+            user_id:
+              _eq: X-Hasura-User-Id
+      columns:
+      - conversation_id
+      - participant_id
+      backend_only: false
+  select_permissions:
+  - role: user
+    permission:
+      columns:
+      - conversation_id
+      - participant_id
+      filter:
+        _or:
+        - conversation:
+            profile:
+              user_id:
+                _eq: X-Hasura-User-Id
+        - profile:
+            user_id:
+              _eq: X-Hasura-User-Id
+      limit: 20
+  update_permissions:
+  - role: user
+    permission:
+      columns: []
+      filter:
+        _or:
+        - conversation:
+            profile:
+              user_id:
+                _eq: X-Hasura-User-Id
+        - profile:
+            user_id:
+              _eq: X-Hasura-User-Id
+      check: null
+- table:
+    schema: public
+    name: message
+  object_relationships:
+  - name: conversation
+    using:
+      foreign_key_constraint_on: conversation_id
+  - name: profile
+    using:
+      foreign_key_constraint_on: sender_id
+  insert_permissions:
+  - role: user
+    permission:
+      check:
+        _or:
+        - conversation:
+            profile:
+              user_id:
+                _eq: X-Hasura-User-Id
+        - conversation:
+            conversation_participants:
+              profile:
+                user_id:
+                  _eq: X-Hasura-User-Id
+      columns:
+      - content
+      - conversation_id
+      - sender_id
+      - timestamp
+      backend_only: false
+  select_permissions:
+  - role: user
+    permission:
+      columns:
+      - content
+      - conversation_id
+      - sender_id
+      - timestamp
+      filter:
+        _or:
+        - conversation:
+            profile:
+              user_id:
+                _eq: X-Hasura-User-Id
+        - conversation:
+            conversation_participants:
+              profile:
+                user_id:
+                  _eq: X-Hasura-User-Id
+      limit: 20
+- table:
+    schema: public
+    name: profile
+  array_relationships:
+  - name: conversation_participants
+    using:
+      foreign_key_constraint_on:
+        column: participant_id
+        table:
+          schema: public
+          name: conversation_participant
+  - name: conversations
+    using:
+      foreign_key_constraint_on:
+        column: owner_id
+        table:
+          schema: public
+          name: conversation
+  - name: messages
+    using:
+      foreign_key_constraint_on:
+        column: sender_id
+        table:
+          schema: public
+          name: message
+  - name: spoons
+    using:
+      foreign_key_constraint_on:
+        column: sender_id
+        table:
+          schema: public
+          name: spoon
+  - name: spoonsByRecipientId
+    using:
+      foreign_key_constraint_on:
+        column: recipient_id
+        table:
+          schema: public
+          name: spoon
+  select_permissions:
+  - role: user
+    permission:
+      columns:
+      - bio
+      - birth_date
+      - first_name
+      - gender
+      - id
+      - last_name
+      - profile_picture
+      filter: {}
+      limit: 30
+  update_permissions:
+  - role: user
+    permission:
+      columns:
+      - bio
+      - birth_date
+      - email
+      - first_name
+      - gender
+      - last_name
+      - phone_number
+      - profile_picture
+      filter:
+        user_id:
+          _eq: X-Hasura-User-Id
+      check: null
+- table:
+    schema: public
+    name: spoon
+  object_relationships:
+  - name: profile
+    using:
+      foreign_key_constraint_on: sender_id
+  - name: profileByRecipientId
+    using:
+      foreign_key_constraint_on: recipient_id
+  insert_permissions:
+  - role: user
+    permission:
+      check:
+        profile:
+          user_id:
+            _eq: X-Hasura-User-Id
+      columns:
+      - recipient_id
+      - sender_id
+      backend_only: false
+  select_permissions:
+  - role: user
+    permission:
+      columns:
+      - timestamp
+      - sender_id
+      filter:
+        profileByRecipientId:
+          user_id:
+            _eq: X-Hasura-User-Id
+      limit: 20

@@ -1,0 +1,17 @@
+{
+  "name": "Sapi",
+  "short_name": "Sapi",
+  "description": "Meet your food buddy 😋",
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "/",
+  "theme_color": "#F97800",
+  "background_color": "#F97800",
+  "orientation": "portrait",
+  "icons": [{
+    "src": "/assets/icon-circle-180x180.png",
+    "sizes": "180x180",
+    "type": "image/png",
+    "purpose": "maskable any"
+  }]
+}

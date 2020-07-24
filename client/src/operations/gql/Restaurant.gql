@@ -1,0 +1,16 @@
+query SearchRestaurants($search: String!) {
+  search(term: $search, location: "Vancouver, BC", limit: 8) {
+    business {
+      name
+      photos
+      url
+      reviews {
+        user {
+          name
+          imageURL: image_url
+        }
+        text
+      }
+    }
+  }
+}

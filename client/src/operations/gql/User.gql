@@ -1,0 +1,39 @@
+query GetProfile($userID: String!) {
+  profile_by_pk(user_id: $userID) {
+    firstName: first_name
+    lastName: last_name
+    birthDate: birth_date
+    gender
+    bio
+    id
+    profilePicture: profile_picture
+  }
+}
+
+
+mutation AddProfile($userID: String!, $profile: profile_set_input!) {
+  update_profile_by_pk(
+    pk_columns: {user_id: $userID}
+    _set: $profile
+  ) {
+    id
+  }
+}
+
+
+query GetNearbyProfiles($profileID: Int!) {
+  profile(where: {id: {_neq: $profileID}}) {
+    id
+    firstName: first_name
+    profilePicture: profile_picture
+  }
+}
+
+
+query GetNearbyProfile($id: Int!) {
+  profile(where: {id: {_eq: $id}}) {
+    profilePicture: profile_picture
+    firstName: first_name
+    bio
+  }
+}

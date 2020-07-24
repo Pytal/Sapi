@@ -1,0 +1,50 @@
+version: '3.8'
+services:
+
+  graphql-engine:
+    image: hasura/graphql-engine:latest
+    restart: unless-stopped
+    env_file: .env.graphql-engine
+    command:
+      - graphql-engine
+      - --host=${PG_HOST}
+      - --port=${PG_PORT}
+      - --user=${PG_USER}
+      - --password=${PG_PASSWORD}
+      - --dbname=${PG_DBNAME}
+      - serve
+      - --server-port=8080
+      - --admin-secret=${ADMIN_SECRET}
+      - --jwt-secret=${JWT_SECRET}
+      # - --dev-mode
+      # - --admin-internal-errors
+      # production flags
+      # - --enable-console
+      - --enabled-apis=graphql
+      - --cors-domain=${CORS_DOMAIN}
+      - --enable-allowlist
+      - --enabled-log-types=startup,query-log,http-log,websocket-log
+      # - --log-level=info
+      - --enable-telemetry=false
+
+  caddy:
+    image: caddy:latest
+    depends_on:
+      - graphql-engine
+    restart: unless-stopped
+    env_file: .env.caddy
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    command:
+      - caddy
+      - run
+      - --config=/etc/caddy/Caddyfile
+
+volumes:
+  caddy_data:
+  caddy_config:

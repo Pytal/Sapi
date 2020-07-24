@@ -1,0 +1,76 @@
+{
+  "name": "sapi",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "env-cmd -e dev next dev --port 5000",
+    "prebuild": "gql-gen --config schemagen.yaml && gql-gen",
+    "build": "next build",
+    "prod": "next start --port 5000",
+    "export": "next build && next export -o out",
+    "vev": "env-cmd -e dev vc dev --listen 5000",
+    "gen:s": "env-cmd -e graphql gql-gen --config schemagen.yaml",
+    "gen": "gql-gen",
+    "gen:al": "gql-gen --config allowlistgen.yaml",
+    "env:pre": "dpl-env preview",
+    "env:prod": "dpl-env production",
+    "srv": "serve --listen 5500 graphql"
+  },
+  "babel": {
+    "presets": [
+      [
+        "next/babel",
+        {
+          "preset-typescript": {
+            "onlyRemoveTypeImports": true
+          }
+        }
+      ],
+      "linaria/babel"
+    ],
+    "plugins": [
+      "@babel/plugin-proposal-export-namespace-from",
+      "babel-plugin-polished"
+    ]
+  },
+  "dependencies": {
+    "@auth0/nextjs-auth0": "^0.15.0",
+    "formik": "^2.1.5",
+    "framer-motion": "2.0.0-beta.77",
+    "graphql-request": "^2.0.0",
+    "linaria": "^1.3.3",
+    "next": "^9.4.4",
+    "polished": "^3.6.5",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "recoil": "^0.0.10",
+    "subscriptions-transport-ws": "^0.9.17",
+    "urql": "^1.9.8",
+    "yup": "^0.28.5"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-export-namespace-from": "^7.10.4",
+    "@graphql-codegen/cli": "^1.17.4",
+    "@graphql-codegen/near-operation-file-preset": "^1.17.4",
+    "@graphql-codegen/schema-ast": "^1.17.4",
+    "@graphql-codegen/typescript": "^1.17.4",
+    "@graphql-codegen/typescript-graphql-request": "^1.17.4",
+    "@graphql-codegen/typescript-operations": "^1.17.4",
+    "@graphql-codegen/typescript-urql": "^1.17.4",
+    "@pytal/next-css": "^1.0.1",
+    "@types/node": "^14.0.24",
+    "@types/react": "^16.9.43",
+    "@types/yup": "^0.28.3",
+    "@urql/devtools": "^2.0.2",
+    "babel-plugin-polished": "^1.1.0",
+    "deploy-env": "^1.1.3",
+    "env-cmd": "^10.1.0",
+    "graphql": "^15.3.0",
+    "graphql-codegen-join-documents": "^1.0.0",
+    "next-compose-plugins": "^2.2.0",
+    "next-pwa": "^2.6.3",
+    "picomatch": "^2.2.2",
+    "serve": "^11.3.2",
+    "typescript": "^3.9.7",
+    "vercel": "^19.2.0"
+  }
+}

@@ -1,0 +1,3 @@
+version: 2
+migrations_directory: migrations
+metadata_directory: metadata
